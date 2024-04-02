@@ -2,10 +2,10 @@ import argparse
 import json
 import jsoneditor
 import logging
-import re
 import random
-import string
+import re
 import requests
+import string
 from dataclasses import dataclass
 from fake_useragent import UserAgent
 from pprint import pprint
@@ -103,13 +103,14 @@ def process_request(request, phone):
     url = format_by_pattern(request["url"], phone)
     logging.info("URL: %s", url)
 
+    method = request.get("method", "POST").upper()
+    logging.info("Method: %s", method)
+
     params = {
-        "method": request["method"],
         "url": url,
+        "method": method,
         "headers": {"User-Agent": ua.random}
     }
-
-    logging.info("Method: %s", request["method"].upper())
 
     if "headers" in request:
         for k, v in request["headers"].items():
@@ -131,15 +132,25 @@ def process_request(request, phone):
 
         params["json"] = json_body
 
+    if "params" in request:
+        url_params = {
+            k: format_by_pattern(v, phone)
+            for k, v in request["params"].items()
+        }
+
+        logging.debug("Params: %s", url_params)
+
+        params["params"] = url_params
+
     if "data" in request:
-        formdata = {
+        form_data = {
             format_by_pattern(k, phone): format_by_pattern(v, phone)
             for k, v in request["data"].items()
         }
 
-        logging.debug("Form data Body: %s", formdata)
+        logging.debug("Form data Body: %s", form_data)
 
-        params["data"] = formdata
+        params["data"] = form_data
 
     logging.debug("Sending request with params: %s", params)
 
