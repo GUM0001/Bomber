@@ -1,3 +1,4 @@
 jsoneditor
 requests
 fake-useragent
+curlparser
