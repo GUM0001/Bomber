@@ -22,7 +22,7 @@ def process(text):
         json_data["params"] = {k: v for k, v in args}
 
     if result.header:
-        headers = result.header.copy()
+        headers = {k: v.strip() for k, v in result.header.items()}
         if "User-Agent" in headers:
             del headers["User-Agent"]
         json_data["headers"] = headers
