@@ -186,7 +186,7 @@ def on_result(result, filename, phone):
     print(json.dumps(result))
 
     with open(filename, "w", encoding="UTF-8") as file:
-        file.write(json.dumps(result))
+        file.write(json.dumps(result, indent=4))
 
     process_services(result, phone)
 
