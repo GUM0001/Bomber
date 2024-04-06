@@ -121,7 +121,8 @@ def process_request(request, phone):
         logging.info("Headers: %s", params["headers"])
 
     if "json" in request:
-        json_body = format_by_pattern(json.dumps(request["json"]), phone)
+        json_body = format_by_pattern(
+            json.dumps(request["json"]) if isinstance(request["json"], dict) else request["json"], phone)
 
         try:
             json.loads(json_body)
@@ -130,7 +131,7 @@ def process_request(request, phone):
 
         logging.debug("JSON Body: %s", json_body)
 
-        params["json"] = json_body
+        params["json"] = json.loads(json_body)
 
     if "params" in request:
         url_params = {

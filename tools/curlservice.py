@@ -11,10 +11,12 @@ def process(text):
     parsed = urlparse(result.url)
     args = parse_qsl(parsed.query)
 
+    headers = {}
+
     json_data = {
         "method": result.method,
         "url": result.url,
-        "headers": {},
+        "headers": headers,
     }
 
     if args:
@@ -22,13 +24,15 @@ def process(text):
         json_data["params"] = {k: v for k, v in args}
 
     if result.header:
-        headers = {k: v.strip() for k, v in result.header.items()}
-        if "User-Agent" in headers:
-            del headers["User-Agent"]
-        json_data["headers"] = headers
+        headers = {k.lower(): v.strip() for k, v in result.header.items()}
+        
+        json_data["headers"].update(headers)
+
+        if "user-agent" in headers:
+            del headers["user-agent"]
 
     if result.data:
-        content_type = result.header.get("content-type", "").strip()
+        content_type = headers.get("content-type", "").strip()
         if content_type.startswith("application/x-www-form-urlencoded"):
             json_data["data"] = dict(parse_qsl(result.data))
         else:
