@@ -1,5 +1,5 @@
 import curlparser
-import json
+from bomber import bomber
 from urllib.parse import urlparse, parse_qsl
 
 
@@ -28,18 +28,17 @@ def process(text):
         json_data["headers"] = headers
 
     if result.data:
-        content_type = result.header.get("Content-Type", "").split(";")[0]
+        content_type = result.header.get("content-type", "").strip()
         if content_type.startswith("application/x-www-form-urlencoded"):
             json_data["data"] = dict(parse_qsl(result.data))
         else:
             json_data["json"] = result.data
 
-    print(json.dumps(json_data))
+    return json_data
 
 
 def main():
-    print("Enter request data:")
-    print("After entering data, press Ctrl+D (on Linux/Mac) or Ctrl+Z (on Windows) to finish input.")
+    print("Enter request data: (Press Ctrl+D (on Linux/Mac) or Ctrl+Z (on Windows) to finish input)")
 
     user_input = []
     try:
@@ -48,8 +47,8 @@ def main():
     except EOFError:
         pass
 
-    request_data = '\n'.join(user_input)
-    process(request_data)
+    data = process('\n'.join(user_input))
+    bomber(data)
 
 
 if __name__ == "__main__":

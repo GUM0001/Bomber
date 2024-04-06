@@ -199,16 +199,20 @@ parser.add_argument('-e', '--edit', action='store_true', help='Run editor')
 
 args = parser.parse_args()
 
-country_code = args.country_code.strip() if args.country_code.strip() else "7"
 
-phone_number = args.phone.strip() if args.phone else input("Enter phone number: ")
+def bomber(base):
+    country_code = args.country_code.strip() if args.country_code.strip() else "7"
+    phone_number = args.phone.strip() if args.phone else input("Enter phone number: ")
+    phone = Phone(country_code, phone_number)
 
-phone = Phone(country_code, phone_number)
+    if args.edit:
+        jsoneditor.editjson(base, callback=lambda result: on_result(result, args.file, phone))
+    else:
+        process_services(base, phone)
 
-with open(args.file, "r", encoding="UTF-8") as file:
-    base = json.loads(file.read())
 
-if args.edit:
-    jsoneditor.editjson(base, callback=lambda result: on_result(result, args.file, phone))
-else:
-    process_services(base, phone)
+if __name__ == "__main__":
+    with open(args.file, "r", encoding="UTF-8") as file:
+        base = json.loads(file.read())
+
+    bomber(base)
